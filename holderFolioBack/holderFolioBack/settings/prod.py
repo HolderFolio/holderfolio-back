@@ -9,14 +9,14 @@ SECRET_KEY = get_env_variable('SECRET_KEY')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', 
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2', 
+#     }
+# }
 
 INSTALLED_APPS += (
-    'whitenoise.runserver_nostatic',
+    # 'whitenoise.runserver_nostatic',
 )
 
 MIDDLEWARE += [
