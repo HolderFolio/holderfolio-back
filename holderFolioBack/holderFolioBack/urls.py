@@ -8,6 +8,7 @@ from django.urls import path, re_path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     re_path('api/v1/user/', include('app.user.api.v1.urls')),
+    re_path('api/v1/portfolio/', include('app.portfolio.api.v1.urls')),
 ]
 
 if settings.DEBUG:

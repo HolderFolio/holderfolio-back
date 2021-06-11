@@ -2,8 +2,6 @@ import os
 import corsheaders
 import rest_framework
 
-
-
 from pathlib import Path
 from .utils import get_secret
 
@@ -20,6 +18,7 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 
     'app.user',
+    'app.portfolio',
 ]
 
 THIRD_PARTY_APPS = [
