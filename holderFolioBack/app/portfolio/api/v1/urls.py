@@ -10,6 +10,7 @@ urlpatterns = [
     path('create/', PortFolioCreateView.as_view() , name='create_portfolio'),
     path('list/', PortFolioListView.as_view() , name='list_portfolio'),
     path('retrive/<int:pk>/', PortFolioRetriveUpdateView.as_view() , name='get_portfolio'),
+    path('global/retrive/<int:pk>/', PortFolioRetriveUpdateView.as_view() , name='global_retrive_portfolio'),
     path('update/<int:pk>/', PortFolioRetriveUpdateView.as_view() , name='update_portfolio'),
 ]
 

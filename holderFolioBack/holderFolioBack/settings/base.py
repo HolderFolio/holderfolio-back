@@ -19,6 +19,7 @@ DJANGO_APPS = [
 
     'app.user',
     'app.portfolio',
+    'app.exchange',
 ]
 
 THIRD_PARTY_APPS = [

@@ -13,6 +13,8 @@ LIST_PORTFOLIO_URL = reverse('portfolio:list_portfolio')
 
 def GET_PORTFOLIO_URL(id):
         return reverse('portfolio:get_portfolio', kwargs={'pk': id})
+def Gobal_RETIVE_PORTFOLIO_URL(id):
+        return reverse('portfolio:global_retrive_portfolio', kwargs={'pk': id})
 def UPDATE_PORTFOLIO_URL(id):
         return reverse('portfolio:update_portfolio', kwargs={'pk': id})
 
@@ -111,3 +113,8 @@ class PrivatePortFolioApiTests(TestCase):
         res = self.client.patch(UPDATE_PORTFOLIO_URL(portfolio.pk), payload)
 
         self.assertEqual(res.data['name'], 'New name')
+    
+    def test_retrive_full_data_portfolio(self):
+        """ retourn les datas complet pour """
+        
+        pass
