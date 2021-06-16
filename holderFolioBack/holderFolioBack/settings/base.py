@@ -20,6 +20,7 @@ DJANGO_APPS = [
     'app.user',
     'app.portfolio',
     'app.exchange',
+    'app.assets'
 ]
 
 THIRD_PARTY_APPS = [
@@ -84,7 +85,6 @@ PASSWORD_HASHERS = [
 REST_AUTH_SERIALIZERS = {
     'PASSWORD_RESET_SERIALIZER': 'app.user.api.v1.serializers.PasswordResetSerializer',
 }
-
 
 
 # AUTH

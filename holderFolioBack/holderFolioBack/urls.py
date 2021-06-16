@@ -9,6 +9,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     re_path('api/v1/user/', include('app.user.api.v1.urls')),
     re_path('api/v1/portfolio/', include('app.portfolio.api.v1.urls')),
+    re_path('api/v1/exchange/', include('app.exchange.api.v1.urls')),
+    re_path('api/v1/asset/', include('app.assets.api.v1.urls')),
 ]
 
 if settings.DEBUG:
