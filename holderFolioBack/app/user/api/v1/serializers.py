@@ -1,19 +1,45 @@
+
 from django.contrib.auth.forms import PasswordResetForm
 from django.conf import settings
 
 from rest_framework import serializers
 
-from app.user.models import User
+from app.user.models import User, SettingUser
+
+
+class SettingsUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        models=SettingUser
+        fields= "__all__"
+
 
 class UserSerializer(serializers.ModelSerializer):
+    settings = serializers.SerializerMethodField()
+
     class Meta:
         model = User
         fields = (
-            'id', 'email', 'password', 'username'
+            'id', 'email', 'password', 'username', 'settings'
         )
         extra_kwargs = {
             'password': {'write_only': True, 'required': True, }, 
+            # 'username': {'required': False, }, 
         }
+
+    def get_settings(self, obj):
+        user = SettingUser.objects.get(user=obj)
+        serializer_settings = SettingsUserSerializer(user)
+        return serializer_settings.data
+
+
+class SettingsUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SettingUser
+        fields = (
+            'theme', 'graphTime', 'langage', 'defaultFolio', 'devise'
+        )
+
 
 class PasswordResetSerializer(serializers.Serializer):
     """

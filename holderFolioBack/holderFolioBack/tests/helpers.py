@@ -1,11 +1,14 @@
 import datetime
+import pytz
 
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 from rest_framework.authtoken.models import Token
 
 from app.portfolio.models import PortFolio
 from app.exchange.models import Exchange
+from app.assets.models import Asset
 
 def create_user(**params):
     """ Helper function créer un nouvel user """
@@ -21,7 +24,7 @@ def create_portfolio(**params):
     defaults = {
         'name': 'default folio'
     }
-    defaults.update(params)
+    defaults.update(**params)
     return PortFolio.objects.create(**defaults)
 
 def create_exchange(**params):
@@ -37,11 +40,11 @@ def create_asset(**params):
     """ creer un asset """
 
     defaults = {
-        'date': datetime.datetime.now(),
+        'date': datetime.datetime.now(tz=timezone.utc),
         'amount': 2,
         'paire': 'USDT',
         'price': 10,
         'type': 'buy'
     }
     defaults.update(params)
-    return Exchange.objects.create(**defaults)
+    return Asset.objects.create(**defaults)

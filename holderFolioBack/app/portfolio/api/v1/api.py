@@ -21,13 +21,18 @@ class PortFolioCreateView(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = PortFolioSerializer
 
+
     def post(self, request, *args, **kwargs):
-        if request.POST.get('user'):
-            raise PermissionDenied()
-        if request.user.is_authenticated and request.POST.get('name'):
+        if request.user.is_authenticated:
+            try:
+                request.data['name']
+                if request.data['name'] == '':
+                    return Response({'status_code': status.HTTP_400_BAD_REQUEST,})
+            except: 
+                return Response({'status_code': status.HTTP_400_BAD_REQUEST,})
             folio = PortFolio.objects.create(
                 user= request.user,
-                name= request.POST.get('name')
+                name= request.data['name']
             )
             serializer = PortFolioSerializer(folio, context={'request': request})
             return Response({
@@ -39,7 +44,7 @@ class PortFolioCreateView(generics.CreateAPIView):
                 }})
         return super().post(request, *args, **kwargs)
 
-class PortFolioRetriveUpdateView(generics.RetrieveUpdateAPIView):
+class PortFolioRetriveUpdateView(generics.RetrieveUpdateDestroyAPIView):
     """API qui permet de retrive un portfolio"""
 
     authentication_classes = (authentication.TokenAuthentication,)

@@ -10,7 +10,7 @@ from .helpers import create_user
 
 SIGNUP_USER_URL = reverse('user:signup_user')
 SIGNIN_USER_URL = reverse('user:signin_user')
-UPDATE_USER_URL = reverse('user:update_user')
+UPDATE_USER_URL = reverse('user:me_user')
 REST_PASSWORD_URL = reverse('user:rest_password_reset')
 
 
@@ -48,6 +48,14 @@ class PublicUserApiTests(TestCase):
         res = self.client.post(SIGNUP_USER_URL, payload)
       
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)       
+
+    def test_settings_in_user(self):
+        """ Test que objets settings soit bien créer à la créatoion du user """
+
+        payload = {'email': 'testuser@holderfolio2.com','passwordConfirm':'12HolderFolio34', 'password': '12HolderFolio34'}
+        res = self.client.post(SIGNUP_USER_URL, payload)
+  
+        self.assertIn('settings', res.data['user'])
 
     def test_if_token_existe_after_create_user(self):
         """ test que le token existe à la creation """
@@ -111,3 +119,5 @@ class PrivateUserApiTests(TestCase):
         res = self.client.patch(UPDATE_USER_URL, newPayload)
 
         self.assertEqual(res.data['user']['username'], 'newHoldername')
+    
+ 

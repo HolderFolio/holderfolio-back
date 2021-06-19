@@ -15,7 +15,7 @@ def GET_PORTFOLIO_URL(id):
         return reverse('portfolio:get_portfolio', kwargs={'pk': id})
 def Gobal_RETIVE_PORTFOLIO_URL(id):
         return reverse('portfolio:global_retrive_portfolio', kwargs={'pk': id})
-def UPDATE_PORTFOLIO_URL(id):
+def MANAGE_PORTFOLIO_URL(id):
         return reverse('portfolio:update_portfolio', kwargs={'pk': id})
 
 
@@ -64,21 +64,21 @@ class PrivatePortFolioApiTests(TestCase):
 
         self.assertEqual(res.data['status_code'], status.HTTP_201_CREATED)
 
-    def test_create_portfolio_user_forbidden(self):
-        """ test la creation d'un portfolio """
-
-        payload = {'name': 'first folio', 'user': self.user}
-        res = self.client.post(CREATE_PORTFOLIO_URL, payload)
-
-        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
-
     def test_create_portfolio_name_empty(self):
-        """ test la creation d'un portfolio """
+        """ test la creation d'un portfolio nom vide"""
 
         payload = {'name': ''}
         res = self.client.post(CREATE_PORTFOLIO_URL, payload)
 
-        self.assertEqual(res.status_code,  status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.data['status_code'],  status.HTTP_400_BAD_REQUEST)
+
+    def test_create_portfolio_no_name(self):
+        """ test la creation d'un portfolio sans nom """
+
+        payload = {}
+        res = self.client.post(CREATE_PORTFOLIO_URL, payload)
+
+        self.assertEqual(res.data['status_code'],  status.HTTP_400_BAD_REQUEST)
 
     def test_retrive_portfolio_success(self):
         """ test le retour du portfolio selectionné """
@@ -110,11 +110,14 @@ class PrivatePortFolioApiTests(TestCase):
 
         payload = {'name': 'New name'}
         portfolio = create_portfolio(**{'name': 'Folio 1', 'user':self.user})
-        res = self.client.patch(UPDATE_PORTFOLIO_URL(portfolio.pk), payload)
+        res = self.client.patch(MANAGE_PORTFOLIO_URL(portfolio.pk), payload)
 
         self.assertEqual(res.data['name'], 'New name')
     
-    def test_retrive_full_data_portfolio(self):
-        """ retourn les datas complet pour """
-        
-        pass
+    def test_delete_portfolio(self):
+        """ test delete asset """
+
+        portfolio = create_portfolio(**{'name': 'Folio 1', 'user':self.user})
+        res = self.client.delete(MANAGE_PORTFOLIO_URL(portfolio.pk))
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)

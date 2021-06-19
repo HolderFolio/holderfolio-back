@@ -6,7 +6,7 @@ from app.portfolio.models import PortFolio
 from app.exchange.models import Exchange
 
 
-class asset(TimeStampedModel):
+class Asset(TimeStampedModel):
     STATUS_CHOICES = [
         ('buy', 'buy'),
         ('sell', 'sell'),
@@ -25,7 +25,7 @@ class asset(TimeStampedModel):
         on_delete=models.CASCADE,
     )
 
-    date = models.DateTimeField(null=True, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
     amount = models.IntegerField()
     paire = models.CharField(max_length=100)
     price = models.IntegerField()

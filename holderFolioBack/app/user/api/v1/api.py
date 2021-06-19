@@ -6,12 +6,12 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import status, generics, permissions, authentication
+from rest_framework import serializers, status, generics, permissions, authentication
 
 from firebase_admin import auth
 
-from .serializers import (UserSerializer, LoginSocialSerializer)
-from app.user.models import User
+from .serializers import (UserSerializer, LoginSocialSerializer, SettingsUserSerializer)
+from app.user.models import User, SettingUser
 
 
 
@@ -27,9 +27,11 @@ class UserCreateView(generics.CreateAPIView):
 
         response = super().post(request, *args, **kwargs)
         token = Token.objects.get_or_create(user_id=response.data['id'])
+
         return Response({
             'token': str(token[0]),
             'user': response.data,
+            # 'settings': response.data['settingUser'],
             'status': status.HTTP_201_CREATED
         })
 
@@ -77,7 +79,6 @@ class GetAuthTokenAndData(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         user = authenticate(
             email=request.data['email'], password=request.data['password'])
-        
         user_serializer = UserSerializer(
             user, many=False, context={'request': request})
         if user is not None:

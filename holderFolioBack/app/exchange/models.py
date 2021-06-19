@@ -12,7 +12,7 @@ class Exchange(TimeStampedModel):
         ('FTX', 'FTX'),
         ('Other', 'Other')
     ]
-    name = models.CharField(max_length=50, choices=STATUS_CHOICES, default='Other')
+    name = models.CharField(max_length=50, null=False, blank=False, choices=STATUS_CHOICES)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
