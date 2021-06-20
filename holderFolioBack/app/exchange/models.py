@@ -20,6 +20,7 @@ class Exchange(TimeStampedModel):
     portfolio = models.ForeignKey(
         PortFolio,
         on_delete=models.CASCADE,
+        related_name='portfolio'
     )
 
     class Meta:

@@ -1,3 +1,5 @@
+import json
+
 from django.db.models import Q
 
 from rest_framework import generics, authentication, permissions, serializers, status
@@ -16,26 +18,32 @@ class AssetCreateView(generics.CreateAPIView):
     serializer_class = AssetSerializer
 
     def post(sefl, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
+        # response = super().post(request, *args, **kwargs)
         if request.user.is_authenticated:
-            portfolio = PortFolio.objects.get(user=request.user, pk=request.POST.get('portfolio'))
-            exchange = Exchange.objects.get(user=request.user, portfolio=portfolio, pk=request.POST.get('exchange'))
-            asset = Asset.objects.create(
-                user = request.user,
-                portfolio = portfolio,
-                exchange = exchange,
-                date = request.POST.get('date'),
-                amount = request.POST.get('amount'),
-                paire = request.POST.get('paire'),
-                price = request.POST.get('price'),
-                type = request.POST.get('type')
-            )
-            if asset:
+            portfolio_name = request.POST.get('portfolio') or request.data['portfolio']
+            exchange_name = request.POST.get('exchange') or request.data['exchange']
+            paire_name = request.POST.get('paire') or request.data['paire']
+
+            portfolio = PortFolio.objects.get(user=request.user, pk=portfolio_name)
+            exchange = Exchange.objects.get(user=request.user, portfolio=portfolio, pk=exchange_name)
+            IExist = Asset.objects.filter(Q(user=request.user) & Q(portfolio__name=portfolio) & Q(exchange__name=exchange) & Q(paire=paire_name)).exists()
+            if IExist == False:
+                asset = Asset.objects.create(
+                    user = request.user,
+                    portfolio = portfolio,
+                    exchange = exchange,
+                    date = request.POST.get('date') or request.data['date'],
+                    amount = request.POST.get('amount') or request.data['amount'],
+                    paire = request.POST.get('paire') or request.data['paire'],
+                    price = request.POST.get('price') or request.data['price'],
+                    type = request.POST.get('type') or request.data['type']
+                )
                 serializer = AssetSerializer(asset, context={'request': request})
                 return Response({
                     'status_code': status.HTTP_201_CREATED,
                     'data': serializer.data
                 })
+            return Response({'status_code': status.HTTP_400_BAD_REQUEST, 'error': 'Wrong asset name'})
                 
 
 class AssetRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
@@ -52,13 +60,32 @@ class AssetListView(generics.ListAPIView):
     authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = AssetSerializer
+    queryset =  Asset.objects.all()
+
+
 
     def get_queryset(self):
+        portfolio = ''
+        exchange = ''
+        if self.request.data:
+            portfolio = self.request.data['portfolio']
+            exchange = self.request.data['exchange']
+        else:
+            portfolio = self.request.GET.get('portfolio')
+            exchange = self.request.GET.get('exchange')
+
         try:
+            self.request.data['exchange']
             exchange = Asset.objects.filter(
                 Q(user=self.request.user) & 
-                Q(portfolio__name=self.request.GET.get('portfolio')) & 
-                Q(exchange__name=self.request.GET.get('exchange')))
+                Q(portfolio__pk=portfolio) & 
+                Q(exchange__pk=exchange))
             return exchange
         except:
-            raise ObjectDoesNotExist()
+            exchange = Asset.objects.filter(
+                Q(user=self.request.user) & 
+                Q(portfolio__pk=portfolio))
+            return exchange
+
+
+

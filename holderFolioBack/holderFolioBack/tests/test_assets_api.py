@@ -100,7 +100,8 @@ class PrivatePortFolioApiTests(TestCase):
             **{'exchange': self.exchange, 'user': self.user, 'portfolio': self.portfolio})
         asset2 = create_asset(
             **{'exchange': self.exchange, 'user': self.user, 'portfolio': self.portfolio})
-        payload ={'portfolio': self.portfolio, 'exchange': self.exchange}
+            
+        payload ={'portfolio': self.portfolio.pk, 'exchange': self.exchange.pk}
         res = self.client.get(LIST_ASSET_URL, payload)
 
         self.assertEqual(len(res.data), 2)

@@ -20,61 +20,37 @@ class ExchangeCreateView(generics.CreateAPIView):
     serializer_class = ExchangeSerializer
 
     def post(sefl, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            portfolio_name = request.data['portfolio']
+        portfolio_name = request.data['portfolio']
+        exchange_name = request.data['name']
+        user = request.user
+
+        if user.is_authenticated:
             portfolio = PortFolio.objects.get(user=request.user, pk=portfolio_name)
-            if portfolio:
-                exchange = Exchange.objects.create(
-                    name= request.data['name'],
-                    user= request.user,
-                    portfolio= portfolio
-                )
-                if exchange.pk:
-                    serializer = ExchangeSerializer(exchange, context={'request': request})
-                    return Response({
-                        'status_code': status.HTTP_201_CREATED,
-                        'portfolio': {
-                            'pk': serializer.data.get('pk'),
-                            'name': serializer.data.get('name'),
-                            'portfolio': serializer.data.get('portfolio'),
-                            'user': serializer.data.get('user')
-                            }})
-                else:
-                    return Response({'status_code': status.HTTP_400_BAD_REQUEST,})
-        return super().post(request, *args, **kwargs)
-# class ExchangeCreateView(generics.CreateAPIView):
-
-#     """API qui permet de créer un exchange"""
-
-#     authentication_classes = (authentication.TokenAuthentication,)
-#     permission_classes = (permissions.IsAuthenticated,)
-#     serializer_class = ExchangeSerializer
-
-#     def post(sefl, request, *args, **kwargs):
-#         print(request.data)
-#         response = super().post(request, *args, **kwargs)
-#         if request.user.is_authenticated:
-#             try:
-#                 portfolio_name = request.POST.get('portfolio')
-#                 portfolio = PortFolio.objects.get(user=request.user, pk=portfolio_name)
-#                 if portfolio:
-#                     exchange = Exchange.objects.create(
-#                         user= request.user,
-#                         name= request.POST.get('name'),
-#                         portfolio= portfolio
-#                     )
-#                     if exchange:
-#                         serializer = ExchangeSerializer(exchange, context={'request': request})
-#                         return Response({
-#                             'status_code': status.HTTP_201_CREATED,
-#                             'portfolio': {
-#                                 'pk': serializer.data.get('pk'),
-#                                 'name': serializer.data.get('name'),
-#                                 'portfolio': serializer.data.get('portfolio'),
-#                                 'user': serializer.data.get('user')
-#                             }})
-#             except:
-#                 raise ObjectDoesNotExist()              
+            ifExist = Exchange.objects.filter(
+                Q(name=exchange_name),
+                Q(user=user),
+                Q(portfolio=portfolio)).exists()
+            if ifExist == False:
+                for name in Exchange.STATUS_CHOICES:
+                    if name[0] == exchange_name:
+                        exchange = Exchange.objects.create(
+                            name=exchange_name,
+                            user=user,
+                            portfolio=portfolio
+                        )
+                        serializer = ExchangeSerializer(exchange, context={'request': request})
+                        return Response({
+                            'status_code': status.HTTP_201_CREATED,
+                            'exchange': {
+                                'pk': serializer.data.get('pk'),
+                                'name': serializer.data.get('name'),
+                                'portfolio': serializer.data.get('portfolio'),
+                                'user': serializer.data.get('user')
+                                }})
+                return Response({'status_code': status.HTTP_400_BAD_REQUEST, 'error': 'Wrong exchange name'})
+            else:
+                return Response({'status_code': status.HTTP_400_BAD_REQUEST, 'error': 'exchange allready existe'})
+        return super().post(request, *args, **kwargs)            
 
 class ExchangeRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     """ Permet de voir, modifier et supprimer un exchange """
@@ -92,9 +68,11 @@ class ExchangeListView(generics.ListAPIView):
     serializer_class = ExchangeSerializer
 
     def get_queryset(self):
-        if 'portfolio' in self.request.query_params:
+        portfolio = ''
+        if self.request.query_params.get('portfolio'):
             portfolio = self.request.query_params.get('portfolio')
-            return Exchange.objects.filter(Q(user=self.request.user) & Q(portfolio__name=portfolio))
-        else: 
-            raise ObjectDoesNotExist()
+        elif self.request.data['portfolio']:
+            portfolio = self.request.data['portfolio']
+        return Exchange.objects.filter(Q(user=self.request.user) & Q(portfolio__name=portfolio))
+  
         

@@ -67,14 +67,14 @@ class PrivatePortFolioApiTests(TestCase):
 
         self.assertEqual(res.data['status_code'], status.HTTP_201_CREATED)
 
-    # def test_create_exchange_wrong_name(self):
-    #     """ test la creation d'un portfolio """
+    def test_create_exchange_wrong_name(self):
+        """ test la creation d'un portfolio """
 
-    #     payload = {'name': 'd', 'portfolio': self.portfolio.pk,
-    #                'user': self.user.pk}
-    #     res = self.client.post(CREATE_EXCHANGE_URL, payload)
+        payload = {'name': 'd', 'portfolio': self.portfolio.pk,
+                   'user': self.user.pk}
+        res = self.client.post(CREATE_EXCHANGE_URL, payload)
 
-    #     self.assertEqual(res.status_code,  status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(res.data['status_code'],  status.HTTP_400_BAD_REQUEST)
 
     def test_retrive_exchange_success(self):
         """ test le retour du portfolio selectionné """
