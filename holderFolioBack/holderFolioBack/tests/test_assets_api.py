@@ -17,6 +17,8 @@ LIST_ASSET_URL = reverse('asset:list_asset')
 
 def MANAGE_ASSET_URL(id):
     return reverse('asset:manage_asset', kwargs={'pk': id})
+def RETRIVE_ASSET_FROM_EXCHANGE_URL(id):
+        return reverse('asset:retrive_qqasset_echange', kwargs={'pk': id})
 
 
 class NotLoginPortFolioApiTests(TestCase):
@@ -60,7 +62,7 @@ class PrivatePortFolioApiTests(TestCase):
         self.portfolio = create_portfolio(**{'user': self.user})
         self.exchange = create_exchange(**{'user': self.user, 'portfolio': self.portfolio, 'name': 'Binance'})
         self.payload_asset = {
-            'date': datetime.datetime.now(),'amount': 2,
+            'date': datetime.datetime.now(),'amount': 2, 'name': 'BTC',
             'paire': 'USDT','price': 10,'type': 'buy',
             'user': self.user.pk, 'portfolio': self.portfolio.pk, 'exchange': self.exchange.pk
         }
@@ -113,7 +115,7 @@ class PrivatePortFolioApiTests(TestCase):
         asset = create_asset(
             **{'exchange': self.exchange, 'user': self.user, 'portfolio': self.portfolio})
         res = self.client.patch(MANAGE_ASSET_URL(asset.pk), payload)
-
+        print(res.data)
         self.assertEqual(res.data['amount'], 1000)
     
     def test_delete_asset(self):

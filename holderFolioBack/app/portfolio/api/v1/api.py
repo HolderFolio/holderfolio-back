@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status, generics, permissions, authentication
 from rest_framework import generics, authentication, status
 
-from .serializers import (PortFolioSerializer)
+from .serializers import (PortFolioSerializer, PortFolioCustomeSerializer)
 from app.portfolio.models import PortFolio
 from app.user.models import User
 
@@ -59,3 +59,11 @@ class PortFolioListView(generics.ListAPIView):
 
     def get_queryset(self):
         return PortFolio.objects.filter(user=self.request.user)
+
+class PortFolioCustomeRetriveUpdateView(generics.RetrieveAPIView):
+    """ retourn le portfolio choisi avec les asset et exchange lié """
+
+    authentication_classes = (authentication.TokenAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = PortFolioCustomeSerializer
+    queryset =  PortFolio.objects.all()

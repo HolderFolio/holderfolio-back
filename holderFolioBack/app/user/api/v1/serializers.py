@@ -12,7 +12,6 @@ class SettingsUserSerializer(serializers.ModelSerializer):
         models=SettingUser
         fields= "__all__"
 
-
 class UserSerializer(serializers.ModelSerializer):
     settings = serializers.SerializerMethodField()
 

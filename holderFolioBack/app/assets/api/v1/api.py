@@ -1,9 +1,12 @@
 import json
+import pprint
 
 from django.db.models import Q
 
 from rest_framework import generics, authentication, permissions, serializers, status
 from rest_framework.response import Response
+
+from pycoingecko import CoinGeckoAPI
 
 from app.assets.api.v1.serializers import AssetSerializer
 from app.assets.models import Asset
@@ -62,17 +65,22 @@ class AssetListView(generics.ListAPIView):
     serializer_class = AssetSerializer
     queryset =  Asset.objects.all()
 
-
-
     def get_queryset(self):
         portfolio = ''
         exchange = ''
         if self.request.data:
             portfolio = self.request.data['portfolio']
-            exchange = self.request.data['exchange']
+            try:
+                exchange = self.request.data['exchange']
+            except:
+                exchange = None
+            
         else:
             portfolio = self.request.GET.get('portfolio')
-            exchange = self.request.GET.get('exchange')
+            try:
+                exchange = self.request.GET.get('exchange')
+            except:
+                exchange = None
 
         try:
             self.request.data['exchange']

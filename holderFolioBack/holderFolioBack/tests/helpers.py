@@ -42,9 +42,10 @@ def create_asset(**params):
     defaults = {
         'date': datetime.datetime.now(tz=timezone.utc),
         'amount': 2,
-        'paire': 'USDT',
+        'paire': 'USD',
         'price': 10,
-        'type': 'buy'
+        'type': 'buy',
+        'name': 'bitcoin'
     }
     defaults.update(params)
     return Asset.objects.create(**defaults)

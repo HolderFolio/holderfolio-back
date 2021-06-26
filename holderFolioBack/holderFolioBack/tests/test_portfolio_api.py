@@ -1,3 +1,5 @@
+import datetime
+
 from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
@@ -5,7 +7,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.test import APIClient
 from rest_framework import status
 
-from .helpers import create_user, create_portfolio
+from .helpers import create_exchange, create_user, create_portfolio, create_asset
 
 
 CREATE_PORTFOLIO_URL = reverse('portfolio:create_portfolio')
@@ -17,6 +19,8 @@ def Gobal_RETIVE_PORTFOLIO_URL(id):
         return reverse('portfolio:global_retrive_portfolio', kwargs={'pk': id})
 def MANAGE_PORTFOLIO_URL(id):
         return reverse('portfolio:update_portfolio', kwargs={'pk': id})
+def RETRIVE_CUTOME_FOLIO_URL(id):
+        return reverse('portfolio:retrive_custom_portfolio', kwargs={'pk': id})
 
 
 
@@ -121,3 +125,21 @@ class PrivatePortFolioApiTests(TestCase):
         res = self.client.delete(MANAGE_PORTFOLIO_URL(portfolio.pk))
 
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_retive_custom_portfolio_success(self):
+        """ test que l'api retourn bien les portfolio, exchange et asset """
+
+        portfolio = create_portfolio(**{'name': 'Folio 1', 'user':self.user})
+        exchange = create_exchange(**{'user': self.user, 'portfolio': portfolio, 'name': 'Binance'})
+        exchange = create_exchange(**{'user': self.user, 'portfolio': portfolio, 'name': 'FTX'})
+        payload_asset = {
+            'date': datetime.datetime.now(),'amount': 2,
+            'paire': 'USDT','price': 10,'type': 'buy',
+            'user': self.user, 'portfolio': portfolio, 'exchange': exchange
+        }
+        asset = create_asset(**payload_asset)
+        res = self.client.get(RETRIVE_CUTOME_FOLIO_URL(portfolio.pk))
+        print('data',res.data)
+
+        self.assertIn('exchange', res.data)
+        self.assertIn('asset', res.data)
